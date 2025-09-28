@@ -151,7 +151,7 @@ export default function Home() {
 
         {result && (
           <section className={styles.resultsWrapper}>
-            <ResultStatus meta={result.meta} />
+            <ResultStatus meta={result.meta} balances={result.balances} />
             <SummaryCard result={result} />
             <InsightTabs result={result} />
             {result.meta.transfersAnalyzed > 0 ? (

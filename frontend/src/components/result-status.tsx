@@ -1,9 +1,10 @@
-import type { TraceMeta } from "@/types/trace";
+import type { TraceBalances, TraceMeta } from "@/types/trace";
 
 import styles from "./result-status.module.css";
 
 type ResultStatusProps = {
   meta: TraceMeta;
+  balances: TraceBalances;
 };
 
 const formatDate = (value?: string | null) => {
@@ -29,7 +30,7 @@ const estimateDaysFromBlocks = (ranges: Array<{ from: number; to: number }>) => 
   return `約${Math.round(days / 7)}週間分`;
 };
 
-export const ResultStatus = ({ meta }: ResultStatusProps) => {
+export const ResultStatus = ({ meta, balances }: ResultStatusProps) => {
   const rangeDescription = estimateDaysFromBlocks(meta.searchedBlockRanges);
 
   return (
@@ -60,6 +61,14 @@ export const ResultStatus = ({ meta }: ResultStatusProps) => {
             <span className={styles.statValue}>{formatDate(meta.latestTransferAt)}</span>
           </div>
         )}
+        <div className={styles.stat}>
+          <span className={styles.statLabel}>USDT残高</span>
+          <span className={styles.statValue}>{balances.usdt.amount.toLocaleString()} {balances.usdt.symbol}</span>
+        </div>
+        <div className={styles.stat}>
+          <span className={styles.statLabel}>ネイティブ残高</span>
+          <span className={styles.statValue}>{balances.native.amount.toLocaleString(undefined, { maximumFractionDigits: 6 })} {balances.native.symbol}</span>
+        </div>
       </div>
       {meta.notes && (
         <div className={styles.notes}>

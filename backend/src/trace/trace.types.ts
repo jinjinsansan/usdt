@@ -20,6 +20,17 @@ export interface TraceMeta {
   notes?: string[];
 }
 
+export interface TraceBalance {
+  amount: number;
+  raw: string;
+  symbol: string;
+}
+
+export interface TraceBalances {
+  usdt: TraceBalance;
+  native: TraceBalance;
+}
+
 export interface TraceNode {
   id: string;
   parentId?: string;
@@ -44,6 +55,7 @@ export interface TraceResult {
   summary: TraceSummary;
   nodes: TraceNode[];
   meta: TraceMeta;
+  balances: TraceBalances;
 }
 
 export interface TraceRequestInput {

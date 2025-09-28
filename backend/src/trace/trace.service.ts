@@ -45,6 +45,10 @@ const buildEmptyTrace = (address: string, chain: 'ETHEREUM' | 'TRON' | 'BSC' | '
     },
     nodes: [root],
     meta,
+    balances: {
+      usdt: { amount: 0, raw: '0', symbol: 'USDT' },
+      native: { amount: 0, raw: '0', symbol: chain === 'ETHEREUM' ? 'ETH' : chain === 'TRON' ? 'TRX' : chain === 'BSC' ? 'BNB' : chain === 'POLYGON' ? 'MATIC' : 'ETH' },
+    },
   };
 };
 

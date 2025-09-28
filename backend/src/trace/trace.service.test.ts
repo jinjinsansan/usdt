@@ -11,5 +11,6 @@ describe('traceService', () => {
     expect(result.summary.finalDestination).toContain('Binance');
     expect(result.meta.transfersAnalyzed).toBeGreaterThan(0);
     expect(result.meta.noTransfersFound).toBe(false);
+    expect(result.balances.usdt.symbol).toBe('USDT');
   });
 });

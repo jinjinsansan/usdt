@@ -88,4 +88,8 @@ export const buildMockTrace = (address: string): TraceResult => ({
     searchedBlockRanges: [{ from: 0, to: 0 }],
     noTransfersFound: false,
   },
+  balances: {
+    usdt: { amount: 11500, raw: '11500000000', symbol: 'USDT' },
+    native: { amount: 2.3, raw: '2300000000000000000', symbol: 'TRX' },
+  },
 });

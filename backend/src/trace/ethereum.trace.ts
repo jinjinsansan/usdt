@@ -2,7 +2,7 @@ import { Contract, formatUnits } from 'ethers';
 import type { EventLog } from 'ethers';
 
 import { enrichTraceWithSummary } from './trace.risk.js';
-import type { TraceMeta, TraceNode, TraceRequestInput, TraceResult } from './trace.types.js';
+import type { TraceBalances, TraceMeta, TraceNode, TraceRequestInput, TraceResult } from './trace.types.js';
 import { erc20Abi } from '../abi/erc20.js';
 import { ethereumProvider } from '../clients/ethereum.js';
 
@@ -75,6 +75,34 @@ export const fetchEthereumTrace = async (input: TraceRequestInput): Promise<Trac
   const contract = new Contract(USDT_CONTRACT_ADDRESS, erc20Abi, ethereumProvider);
   const latestBlock = await ethereumProvider.getBlockNumber();
   const maxDepth = Math.min(input.depth ?? DEFAULT_DEPTH, MAX_DEPTH);
+
+  let balances: TraceBalances = {
+    usdt: { amount: 0, raw: '0', symbol: 'USDT' },
+    native: { amount: 0, raw: '0', symbol: 'ETH' },
+  };
+
+  try {
+    const [usdtRaw, nativeRaw] = await Promise.all([
+      contract.balanceOf(address).catch(() => BigInt(0)),
+      ethereumProvider.getBalance(address).catch(() => BigInt(0)),
+    ]);
+
+    balances = {
+      usdt: {
+        amount: Number(formatUnits(usdtRaw, USDT_DECIMALS)),
+        raw: usdtRaw.toString(),
+        symbol: 'USDT',
+      },
+      native: {
+        amount: Number(formatUnits(nativeRaw, 18)),
+        raw: nativeRaw.toString(),
+        symbol: 'ETH',
+      },
+    };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Failed to fetch balances', error);
+  }
 
   const rootNode: TraceNode = {
     id: `root-${address}`,
@@ -235,5 +263,6 @@ export const fetchEthereumTrace = async (input: TraceRequestInput): Promise<Trac
     },
     nodes,
     meta,
+    balances,
   });
 };
