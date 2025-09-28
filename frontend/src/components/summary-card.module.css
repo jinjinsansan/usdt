@@ -50,6 +50,24 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(17, 17, 17, 0.25);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 @media (max-width: 640px) {
   .card {
     padding: 26px;

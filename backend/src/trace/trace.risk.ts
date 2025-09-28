@@ -1,4 +1,4 @@
-import { TraceNode, TraceResult, TraceSummary } from './trace.types.js';
+import { TraceMeta, TraceNode, TraceResult, TraceSummary } from './trace.types.js';
 
 const riskWeight: Record<TraceNode['riskLevel'], number> = {
   high: 90,
@@ -26,24 +26,34 @@ const calculateFragmentation = (nodes: TraceNode[]): number => {
   return Math.max(forkCount, 0);
 };
 
-export const buildSummary = (nodes: TraceNode[]): TraceSummary => {
-  const destinationNode = nodes.at(-1);
-  const averageRisk = calculateAverageRisk(nodes);
-  const suspiciousHops = calculateSuspiciousHops(nodes);
-  const fragmentation = calculateFragmentation(nodes);
+export const buildSummary = (nodes: TraceNode[], meta: TraceMeta): TraceSummary => {
+  const transferNodes = nodes.filter((node) => node.depth > 0);
+  const destinationNode = transferNodes.at(-1) ?? nodes.at(-1);
+  const averageRisk = calculateAverageRisk(transferNodes);
+  const suspiciousHops = calculateSuspiciousHops(transferNodes);
+  const fragmentation = calculateFragmentation(transferNodes);
+
+  const finalConfidence = meta.noTransfersFound
+    ? 0.25
+    : destinationNode?.riskLevel === 'low'
+      ? 0.92
+      : 0.65;
+
+  const suspiciousConfidence = suspiciousHops > 0 ? Math.min(0.5 + averageRisk / 200, 0.95) : meta.noTransfersFound ? 0.1 : 0.2;
+  const fragmentationConfidence = fragmentation > 5 ? 0.75 : meta.noTransfersFound ? 0.15 : 0.4;
 
   return {
     finalDestination: destinationNode?.addressLabel ?? destinationNode?.address ?? '不明',
     finalDestinationLabel: destinationNode?.addressLabel,
-    finalDestinationConfidence: destinationNode?.riskLevel === 'low' ? 0.92 : 0.65,
+    finalDestinationConfidence: finalConfidence,
     suspiciousHopCount: suspiciousHops,
-    suspiciousConfidence: suspiciousHops > 0 ? Math.min(0.5 + averageRisk / 200, 0.95) : 0.2,
+    suspiciousConfidence: suspiciousConfidence,
     fragmentationLevel: fragmentation,
-    fragmentationConfidence: fragmentation > 5 ? 0.75 : 0.4,
+    fragmentationConfidence: fragmentationConfidence,
   };
 };
 
 export const enrichTraceWithSummary = (trace: TraceResult): TraceResult => ({
   ...trace,
-  summary: buildSummary(trace.nodes),
+  summary: buildSummary(trace.nodes, trace.meta),
 });

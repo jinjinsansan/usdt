@@ -94,6 +94,16 @@ export const InsightTabs = ({ result }: InsightTabsProps) => {
             </li>
           ))}
         </ul>
+        {result.meta.notes && active === "danger" && (
+          <div className={styles.notes}>
+            {result.meta.notes.map((note) => (
+              <p key={note} className={styles.note}>
+                <span aria-hidden>ℹ️</span>
+                {note}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

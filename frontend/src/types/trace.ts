@@ -28,6 +28,16 @@ export interface TraceNode {
   riskFactors: string[];
 }
 
+export interface TraceMeta {
+  transfersAnalyzed: number;
+  depthExplored: number;
+  earliestTransferAt?: string | null;
+  latestTransferAt?: string | null;
+  searchedBlockRanges: Array<{ from: number; to: number }>;
+  noTransfersFound: boolean;
+  notes?: string[];
+}
+
 export interface TraceResult {
   requestId: string;
   rootAddress: string;
@@ -35,6 +45,7 @@ export interface TraceResult {
   generatedAt: string;
   summary: TraceSummary;
   nodes: TraceNode[];
+  meta: TraceMeta;
 }
 
 export interface TraceRequest {

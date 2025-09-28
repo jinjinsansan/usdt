@@ -84,6 +84,20 @@
   color: #cef9d9;
 }
 
+.notes {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
 @media (max-width: 640px) {
   .container {
     padding: 22px;

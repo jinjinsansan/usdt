@@ -9,6 +9,7 @@ import { HelpButton } from "@/components/help-button";
 import { InsightTabs } from "@/components/insight-tabs";
 import { SummaryCard } from "@/components/summary-card";
 import { TimelineView } from "@/components/timeline-view";
+import { ResultStatus } from "@/components/result-status";
 import { fetchHistory, fetchTrace } from "@/lib/api";
 import type { SupportedChain, TraceRequest, TraceResult } from "@/types/trace";
 import styles from "./page.module.css";
@@ -150,33 +151,44 @@ export default function Home() {
 
         {result && (
           <section className={styles.resultsWrapper}>
+            <ResultStatus meta={result.meta} />
             <SummaryCard result={result} />
             <InsightTabs result={result} />
+            {result.meta.transfersAnalyzed > 0 ? (
+              <>
+                <div className={styles.modeSwitcher}>
+                  <div>
+                    <p className="muted-text">表示モード</p>
+                    <h3>{viewMode === "flow" ? "家系図ビュー" : "時系列ビュー"}</h3>
+                  </div>
+                  <div className={styles.modeButtons}>
+                    <button
+                      type="button"
+                      className={`${styles.modeButton} ${viewMode === "flow" ? styles.modeButtonActive : ""}`}
+                      onClick={() => setViewMode("flow")}
+                    >
+                      家系図風
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.modeButton} ${viewMode === "timeline" ? styles.modeButtonActive : ""}`}
+                      onClick={() => setViewMode("timeline")}
+                    >
+                      LINE風
+                    </button>
+                  </div>
+                </div>
 
-            <div className={styles.modeSwitcher}>
-              <div>
-                <p className="muted-text">表示モード</p>
-                <h3>{viewMode === "flow" ? "家系図ビュー" : "時系列ビュー"}</h3>
+                {viewMode === "flow" ? <FlowView nodes={result.nodes} /> : <TimelineView nodes={result.nodes} />}
+              </>
+            ) : (
+              <div className="surface-card">
+                <p className="muted-text">
+                  現状の検索範囲ではUSDTの送受信が見つかりませんでした。取引の有無をもう一度ご確認いただくか、
+                  別チェーンや別の期間での調査をお試しください。
+                </p>
               </div>
-              <div className={styles.modeButtons}>
-                <button
-                  type="button"
-                  className={`${styles.modeButton} ${viewMode === "flow" ? styles.modeButtonActive : ""}`}
-                  onClick={() => setViewMode("flow")}
-                >
-                  家系図風
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.modeButton} ${viewMode === "timeline" ? styles.modeButtonActive : ""}`}
-                  onClick={() => setViewMode("timeline")}
-                >
-                  LINE風
-                </button>
-              </div>
-            </div>
-
-            {viewMode === "flow" ? <FlowView nodes={result.nodes} /> : <TimelineView nodes={result.nodes} />}
+            )}
           </section>
         )}
 

@@ -6,11 +6,13 @@ type TimelineViewProps = {
 };
 
 export const TimelineView = ({ nodes }: TimelineViewProps) => {
+  const displayNodes = nodes.filter((node) => node.depth > 0);
+
   return (
     <section className={styles.container}>
       <h3 className={styles.title}>時系列ビュー</h3>
       <div className={styles.timeline}>
-        {nodes.map((node, index) => {
+        {displayNodes.map((node, index) => {
           const isMe = index % 2 === 0;
           return (
             <div key={node.id} className={`${styles.row} ${isMe ? styles.rowEnd : styles.rowStart}`}>

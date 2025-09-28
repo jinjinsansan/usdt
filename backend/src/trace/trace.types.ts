@@ -10,6 +10,16 @@ export interface TraceSummary {
   fragmentationConfidence: number;
 }
 
+export interface TraceMeta {
+  transfersAnalyzed: number;
+  depthExplored: number;
+  earliestTransferAt?: string | null;
+  latestTransferAt?: string | null;
+  searchedBlockRanges: Array<{ from: number; to: number }>;
+  noTransfersFound: boolean;
+  notes?: string[];
+}
+
 export interface TraceNode {
   id: string;
   parentId?: string;
@@ -33,6 +43,7 @@ export interface TraceResult {
   generatedAt: string;
   summary: TraceSummary;
   nodes: TraceNode[];
+  meta: TraceMeta;
 }
 
 export interface TraceRequestInput {

@@ -80,4 +80,12 @@ export const buildMockTrace = (address: string): TraceResult => ({
     fragmentationConfidence: 0.78,
   },
   nodes: generateMockNodes(address),
+  meta: {
+    transfersAnalyzed: 3,
+    depthExplored: 3,
+    earliestTransferAt: new Date(Date.now() - 1000 * 50).toISOString(),
+    latestTransferAt: new Date().toISOString(),
+    searchedBlockRanges: [{ from: 0, to: 0 }],
+    noTransfersFound: false,
+  },
 });

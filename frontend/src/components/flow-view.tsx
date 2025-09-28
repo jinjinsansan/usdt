@@ -27,11 +27,13 @@ const explorerBase: Record<TraceNode['chain'], string> = {
 };
 
 export const FlowView = ({ nodes }: FlowViewProps) => {
+  const displayNodes = nodes.filter((node) => node.depth > 0);
+
   return (
     <section className={styles.container}>
       <h3 className={styles.title}>家系図ビュー</h3>
       <div className={styles.list}>
-        {nodes.map((node) => {
+        {displayNodes.map((node) => {
           const depthOffset = node.depth * 24;
           return (
             <div
