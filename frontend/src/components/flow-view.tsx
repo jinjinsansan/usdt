@@ -1,17 +1,11 @@
 import type { TraceNode } from "@/types/trace";
-
-const riskColors = {
-  high: "bg-red-100 text-red-700 border-red-300",
-  medium: "bg-yellow-100 text-yellow-700 border-yellow-300",
-  low: "bg-green-100 text-green-700 border-green-300",
-  unknown: "bg-gray-100 text-gray-700 border-gray-300"
-} as const;
+import styles from "./flow-view.module.css";
 
 const riskLabels = {
-  high: "🔴 高リスク",
-  medium: "🟡 注意",
-  low: "🟢 安全そう",
-  unknown: "⚪ 判定中"
+  high: "高リスク",
+  medium: "注意",
+  low: "安全そう",
+  unknown: "判定中"
 } as const;
 
 type FlowViewProps = {
@@ -34,54 +28,58 @@ const explorerBase: Record<TraceNode['chain'], string> = {
 
 export const FlowView = ({ nodes }: FlowViewProps) => {
   return (
-    <section className="rounded-3xl bg-white p-4 shadow-soft">
-      <h3 className="mb-4 text-xl font-bold">家系図ビュー</h3>
-      <div className="space-y-4">
+    <section className={styles.container}>
+      <h3 className={styles.title}>家系図ビュー</h3>
+      <div className={styles.list}>
         {nodes.map((node) => {
           const depthOffset = node.depth * 24;
           return (
             <div
               key={node.id}
               style={{ marginLeft: `${depthOffset}px` }}
-              className="relative rounded-2xl border border-slate-200 bg-slate-50 p-4"
+              className={`${styles.node} ${node.depth === 0 ? styles.root : ""}`}
             >
-              {node.parentId && (
-                <span className="absolute -left-6 top-5 h-0.5 w-6 bg-slate-300" aria-hidden />
-              )}
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-lg font-semibold">
-                  {node.addressLabel ?? node.address}
-                </p>
-                <span className="rounded-full bg-sky-100 px-3 py-1 text-sm font-medium text-sky-700">
-                  {node.chain}
-                </span>
+              <div className={styles.header}>
+                <p className={styles.address}>{node.addressLabel ?? node.address}</p>
+                <span className={styles.chainBadge}>{node.chain}</span>
                 <span
-                  className={`rounded-full border px-3 py-1 text-sm font-medium ${riskColors[node.riskLevel]}`}
+                  className={`${styles.riskBadge} ${
+                    node.riskLevel === "high"
+                      ? styles.riskHigh
+                      : node.riskLevel === "medium"
+                        ? styles.riskMedium
+                        : node.riskLevel === "low"
+                          ? styles.riskLow
+                          : styles.riskUnknown
+                  }`}
                 >
+                  {node.riskLevel === "high" ? "🔴" : node.riskLevel === "medium" ? "🟡" : node.riskLevel === "low" ? "🟢" : "⚪"}
                   {riskLabels[node.riskLevel]}
                 </span>
               </div>
-              <dl className="mt-2 grid gap-1 text-sm">
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold">送金額:</dt>
+              <dl className={styles.details}>
+                <div className={styles.detailRow}>
+                  <dt className={styles.detailLabel}>送金額:</dt>
                   <dd>{formatAmount(node.usdtAmount, node.usdRate)}</dd>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold">日時:</dt>
+                <div className={styles.detailRow}>
+                  <dt className={styles.detailLabel}>日時:</dt>
                   <dd>{formatTimestamp(node.timestamp)}</dd>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold">手数料:</dt>
-                  <dd>{node.fee.toLocaleString()} {node.chain === "TRON" ? "TRX" : "ガス"}</dd>
+                <div className={styles.detailRow}>
+                  <dt className={styles.detailLabel}>手数料:</dt>
+                  <dd>
+                    {node.fee.toLocaleString()} {node.chain === "TRON" ? "TRX" : "ガス"}
+                  </dd>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold">トランザクション:</dt>
+                <div className={styles.detailRow}>
+                  <dt className={styles.detailLabel}>トランザクション:</dt>
                   <dd>
                     <a
                       href={`${explorerBase[node.chain]}${node.txHash}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sky-600 underline"
+                      className={styles.link}
                     >
                       {node.txHash.substring(0, 12)}...
                     </a>
@@ -89,9 +87,9 @@ export const FlowView = ({ nodes }: FlowViewProps) => {
                 </div>
               </dl>
               {node.riskFactors.length > 0 && (
-                <ul className="mt-3 flex flex-wrap gap-2">
+                <ul className={styles.riskFactors}>
                   {node.riskFactors.map((factor) => (
-                    <li key={factor} className="rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-600">
+                    <li key={factor} className={styles.riskFactor}>
                       {factor}
                     </li>
                   ))}

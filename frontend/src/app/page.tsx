@@ -11,6 +11,7 @@ import { SummaryCard } from "@/components/summary-card";
 import { TimelineView } from "@/components/timeline-view";
 import { fetchHistory, fetchTrace } from "@/lib/api";
 import type { SupportedChain, TraceRequest, TraceResult } from "@/types/trace";
+import styles from "./page.module.css";
 
 type ViewMode = "flow" | "timeline";
 
@@ -81,67 +82,61 @@ export default function Home() {
 
   return (
     <>
-      <main className="mx-auto flex max-w-5xl flex-col gap-8 pb-12">
-        <section id="top" className="rounded-3xl bg-white p-6 shadow-soft">
-          <p className="text-lg font-semibold text-sky-600">USDT追跡くん</p>
-          <h1 className="mt-2 text-4xl font-black text-slate-900">
-            会員登録なしで<br />だれでもUSDTの行き先を一瞬でチェック
-          </h1>
-          <p className="mt-4 text-lg text-slate-600">
-            ウォレットアドレスを入れるだけ。最大10階層の資金の流れと危険サインを、わかりやすい色と絵文字で表示します。
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={handleHeroCTA}
-              className="rounded-full bg-sky-500 px-8 py-4 text-xl font-bold text-white shadow-xl transition hover:bg-sky-600"
-            >
-              今すぐ調べる
-            </button>
-            <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700">
-              🔐 会員登録不要・無料で使えます
-            </span>
+      <main className={styles.container}>
+        <section id="top" className={styles.hero}>
+          <div className={styles.heroContent}>
+            <span className={styles.heroBadge}>USDT TRACKER</span>
+            <h1 className={styles.heroTitle}>
+              会員登録なしで、USDTの資金フローを<br />バイナンス級のダッシュボードで可視化
+            </h1>
+            <p className={styles.heroSubtitle}>
+              ウォレットアドレスを入力するだけで、最大10階層の送金履歴・危険度・最終着地点を一度にチェック。
+              暗号資産に不慣れな方でも直感的に判断できます。
+            </p>
+            <div className={styles.heroActions}>
+              <button type="button" className="btn-primary" onClick={handleHeroCTA}>
+                今すぐ追跡をはじめる
+              </button>
+              <span className={styles.accentInfo}>🔐 ログイン不要・無料で利用できます</span>
+            </div>
           </div>
         </section>
 
-        <section className="rounded-3xl bg-white p-6 shadow-soft" aria-label="チェーン別クイックメニュー">
-          <h2 className="text-2xl font-bold text-slate-900">チェーン別かんたんメニュー</h2>
-          <p className="mt-1 text-sm text-slate-600">よく使うチェーンをタップすると見本アドレスが自動入力されます</p>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <section className={`${styles.quickMenu} surface-card`} aria-label="チェーン別クイックメニュー">
+          <div className={styles.sectionTitleRow}>
+            <h2 className={styles.sectionTitle}>チェーン別クイックスタート</h2>
+            <span className="muted-text">タップするとアドレスが自動入力されます</span>
+          </div>
+          <div className={styles.quickGrid}>
             {quickOptions.map((option) => (
               <button
                 key={option.chain}
                 type="button"
                 onClick={() => handleQuickSelect(option)}
-                className="flex items-center justify-between rounded-2xl border border-sky-100 bg-sky-50 px-4 py-4 text-left transition hover:border-sky-300 hover:bg-sky-100"
+                className={styles.quickCard}
               >
-                <div>
-                  <p className="text-lg font-bold text-slate-900">
-                    <span className="mr-2 text-2xl" aria-hidden>{option.emoji}</span>
-                    {option.label}
-                  </p>
-                  <p className="text-sm text-slate-600">{option.description}</p>
-                </div>
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-sky-600">タップで入力</span>
+                <span className={styles.quickLabel}>
+                  <span aria-hidden>{option.emoji}</span>
+                  {option.label}
+                </span>
+                <p className={styles.quickDescription}>{option.description}</p>
+                <span className="chip">サンプルを入力</span>
               </button>
             ))}
           </div>
         </section>
 
-        <section id="howto" className="rounded-3xl bg-white p-6 shadow-soft" aria-label="使い方">
-          <h2 className="text-2xl font-bold text-slate-900">使い方は3ステップ</h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {howToSteps.map((step, index) => (
-              <div key={step.title} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center">
-                <p className="text-sm font-semibold text-sky-600">STEP {index + 1}</p>
-                <p className="mt-2 text-lg font-bold text-slate-900">{step.title}</p>
-                <p className="mt-1 text-sm text-slate-600">{step.detail}</p>
-              </div>
-            ))}
-          </div>
+        <section id="howto" className={`surface-card ${styles.stepsGrid}`} aria-label="使い方">
+          {howToSteps.map((step, index) => (
+            <div key={step.title} className={styles.stepCard}>
+              <span className={styles.stepNumber}>STEP {index + 1}</span>
+              <h3>{step.title}</h3>
+              <p className="muted-text">{step.detail}</p>
+            </div>
+          ))}
         </section>
 
-        <section ref={formSectionRef} id="history" className="scroll-mt-24">
+        <section ref={formSectionRef} id="history" className={`${styles.formSection} surface-card`}>
           <AddressForm
             history={history}
             loading={loading}
@@ -151,35 +146,29 @@ export default function Home() {
           />
         </section>
 
-        {error && (
-          <div className="rounded-2xl border border-rose-300 bg-rose-50 p-4 text-rose-700">
-            ⚠️ {error}
-          </div>
-        )}
+        {error && <div className="surface-card danger-text">⚠️ {error}</div>}
 
         {result && (
-          <section className="flex flex-col gap-4">
+          <section className={styles.resultsWrapper}>
             <SummaryCard result={result} />
             <InsightTabs result={result} />
 
-            <div className="flex items-center justify-between rounded-3xl bg-white p-4 shadow-soft">
+            <div className={styles.modeSwitcher}>
               <div>
-                <p className="text-sm font-semibold text-slate-600">表示モード</p>
-                <h3 className="text-xl font-bold text-slate-900">
-                  {viewMode === "flow" ? "家系図ビュー" : "時系列ビュー"}
-                </h3>
+                <p className="muted-text">表示モード</p>
+                <h3>{viewMode === "flow" ? "家系図ビュー" : "時系列ビュー"}</h3>
               </div>
-              <div className="flex gap-2">
+              <div className={styles.modeButtons}>
                 <button
                   type="button"
-                  className={`rounded-full px-4 py-2 text-base font-semibold transition ${viewMode === "flow" ? "bg-sky-500 text-white" : "bg-slate-200 text-slate-700"}`}
+                  className={`${styles.modeButton} ${viewMode === "flow" ? styles.modeButtonActive : ""}`}
                   onClick={() => setViewMode("flow")}
                 >
                   家系図風
                 </button>
                 <button
                   type="button"
-                  className={`rounded-full px-4 py-2 text-base font-semibold transition ${viewMode === "timeline" ? "bg-sky-500 text-white" : "bg-slate-200 text-slate-700"}`}
+                  className={`${styles.modeButton} ${viewMode === "timeline" ? styles.modeButtonActive : ""}`}
                   onClick={() => setViewMode("timeline")}
                 >
                   LINE風
@@ -191,14 +180,20 @@ export default function Home() {
           </section>
         )}
 
-        <section id="help" className="rounded-3xl bg-white p-6 shadow-soft">
-          <h2 className="text-2xl font-bold text-slate-900">サポート</h2>
-          <p className="mt-2 text-slate-600">ご不明な点は公式LINEまたはメールでサポートいたします。FAQも順次掲載予定です。</p>
-          {hasHistory && (
-            <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-sm text-slate-600">
-              最近調べたアドレス: {latestHistoryText}
+        <section id="help" className={styles.supportSection}>
+          <div>
+            <h2 className={styles.sectionTitle}>サポート</h2>
+            <p className="muted-text">
+              公式LINEまたはメールで24時間以内にご返信します。詐欺相談や追跡代行もお気軽にお問い合わせください。
             </p>
+          </div>
+          {hasHistory && (
+            <p className={styles.historyHighlight}>最近調べたアドレス: {latestHistoryText}</p>
           )}
+          <div className={styles.supportFooter}>
+            <span>📘 FAQを準備中</span>
+            <span>🤝 パートナー企業募集中</span>
+          </div>
         </section>
       </main>
 

@@ -1,0 +1,52 @@
+.wrapper {
+  position: fixed;
+  right: 24px;
+  bottom: 120px;
+  z-index: 60;
+  display: grid;
+  gap: 12px;
+}
+
+.tooltip {
+  background: var(--color-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: 16px 18px;
+  max-width: 260px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  box-shadow: var(--shadow-soft);
+}
+
+.tooltipTitle {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: var(--radius-pill);
+  padding: 14px 22px;
+  font-weight: 700;
+  background: var(--color-accent);
+  color: #111;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 15px 30px rgba(240, 185, 11, 0.32);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 42px rgba(240, 185, 11, 0.38);
+}
+
+@media (max-width: 640px) {
+  .wrapper {
+    right: 18px;
+    bottom: 110px;
+  }
+}

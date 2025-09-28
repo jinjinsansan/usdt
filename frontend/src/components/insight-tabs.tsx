@@ -3,13 +3,14 @@
 import { useMemo, useState } from "react";
 
 import type { TraceNode, TraceResult } from "@/types/trace";
+import styles from "./insight-tabs.module.css";
 
 type InsightKey = "danger" | "caution" | "safe";
 
-const tabMeta: Record<InsightKey, { label: string; badge: string; color: string }> = {
-  danger: { label: "危険サイン", badge: "🔴", color: "border-rose-200 bg-rose-50 text-rose-700" },
-  caution: { label: "注意ポイント", badge: "🟡", color: "border-amber-200 bg-amber-50 text-amber-700" },
-  safe: { label: "安心材料", badge: "🟢", color: "border-emerald-200 bg-emerald-50 text-emerald-700" }
+const tabMeta: Record<InsightKey, { label: string; badge: string; listClass: string }> = {
+  danger: { label: "危険サイン", badge: "🔴", listClass: styles.listItemDanger },
+  caution: { label: "注意ポイント", badge: "🟡", listClass: styles.listItemCaution },
+  safe: { label: "安心材料", badge: "🟢", listClass: styles.listItemSafe }
 };
 
 const buildInsights = (result: TraceResult) => {
@@ -62,10 +63,10 @@ export const InsightTabs = ({ result }: InsightTabsProps) => {
   const insights = useMemo(() => buildInsights(result), [result]);
 
   return (
-    <section className="rounded-3xl bg-white p-4 shadow-soft">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-xl font-bold text-slate-900">チェックポイント</h3>
-        <div className="flex gap-2">
+    <section className={styles.container}>
+      <header className={styles.header}>
+        <h3>チェックポイント</h3>
+        <div className={styles.tabs}>
           {(Object.keys(tabMeta) as InsightKey[]).map((key) => {
             const meta = tabMeta[key];
             const isActive = active === key;
@@ -74,11 +75,9 @@ export const InsightTabs = ({ result }: InsightTabsProps) => {
                 key={key}
                 type="button"
                 onClick={() => setActive(key)}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  isActive ? "bg-sky-500 text-white" : "bg-slate-200 text-slate-700 hover:bg-slate-300"
-                }`}
+                className={`${styles.tabButton} ${isActive ? styles.tabButtonActive : ""}`}
               >
-                <span className="mr-1" aria-hidden>{meta.badge}</span>
+                <span aria-hidden>{meta.badge}</span>
                 {meta.label}
               </button>
             );
@@ -86,13 +85,11 @@ export const InsightTabs = ({ result }: InsightTabsProps) => {
         </div>
       </header>
 
-      <div className="mt-4 rounded-2xl border p-4 text-base" data-active={active}>
-        <ul className={`space-y-2 ${tabMeta[active].color}`}>
+      <div className={styles.listWrapper} data-active={active}>
+        <ul className={styles.list}>
           {insights[active].map((item) => (
-            <li key={item} className="rounded-xl bg-white/60 px-4 py-2">
-              <span className="mr-2" aria-hidden>
-                {tabMeta[active].badge}
-              </span>
+            <li key={item} className={`${styles.listItem} ${tabMeta[active].listClass}`}>
+              <span aria-hidden>{tabMeta[active].badge}</span>
               {item}
             </li>
           ))}
