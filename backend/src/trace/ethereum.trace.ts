@@ -246,6 +246,7 @@ export const fetchEthereumTrace = async (input: TraceRequestInput): Promise<Trac
     searchedBlockRanges: uniqueBlockRanges,
     noTransfersFound: transferNodes.length === 0,
     notes: notes.length > 0 ? Array.from(new Set(notes)) : undefined,
+    balances,
   };
 
   return enrichTraceWithSummary({

@@ -18,6 +18,7 @@ export interface TraceMeta {
   searchedBlockRanges: Array<{ from: number; to: number }>;
   noTransfersFound: boolean;
   notes?: string[];
+  balances?: TraceBalances;
 }
 
 export interface TraceBalance {

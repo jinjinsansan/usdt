@@ -31,6 +31,7 @@ const estimateDaysFromBlocks = (ranges: Array<{ from: number; to: number }>) => 
 };
 
 export const ResultStatus = ({ meta, balances }: ResultStatusProps) => {
+  const balanceInfo = meta.balances ?? balances;
   const rangeDescription = estimateDaysFromBlocks(meta.searchedBlockRanges);
 
   return (
@@ -45,11 +46,11 @@ export const ResultStatus = ({ meta, balances }: ResultStatusProps) => {
         </div>
         <div className={styles.stat}>
           <span className={styles.statLabel}>たどり着いた深さ</span>
-          <span className={styles.statValue}>{meta.depthExplored} / 10 階層</span>
+          <span className={styles.statValue}>{balanceInfo.usdt.amount.toLocaleString()} {balanceInfo.usdt.symbol}</span>
         </div>
         <div className={styles.stat}>
           <span className={styles.statLabel}>検索した期間</span>
-          <span className={styles.statValue}>{rangeDescription}</span>
+          <span className={styles.statValue}>{balanceInfo.native.amount.toLocaleString(undefined, { maximumFractionDigits: 6 })} {balanceInfo.native.symbol}</span>
         </div>
         <div className={styles.stat}>
           <span className={styles.statLabel}>最古の取引</span>

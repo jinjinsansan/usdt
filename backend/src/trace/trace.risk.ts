@@ -56,4 +56,7 @@ export const buildSummary = (nodes: TraceNode[], meta: TraceMeta): TraceSummary 
 export const enrichTraceWithSummary = (trace: TraceResult): TraceResult => ({
   ...trace,
   summary: buildSummary(trace.nodes, trace.meta),
+  meta: {
+    ...trace.meta,
+  },
 });
