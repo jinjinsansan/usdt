@@ -1,9 +1,52 @@
 import { fetchEthereumTrace } from './ethereum.trace.js';
 import { buildMockTrace } from './trace.mock.js';
 import { enrichTraceWithSummary } from './trace.risk.js';
-import { TraceRequestInput, TraceResult } from './trace.types.js';
+import { TraceRequestInput, TraceResult, TraceMeta, TraceNode } from './trace.types.js';
 
 const recentSearches = new Map<string, TraceResult>();
+
+const buildEmptyTrace = (address: string, chain: 'ETHEREUM' | 'TRON' | 'BSC' | 'POLYGON' | 'ANY' = 'ANY'): TraceResult => {
+  const root: TraceNode = {
+    id: `root-${address}`,
+    depth: 0,
+    address,
+    chain: chain === 'ANY' ? 'ETHEREUM' : chain,
+    txHash: 'root',
+    timestamp: new Date().toISOString(),
+    usdtAmount: 0,
+    usdRate: 1,
+    fee: 0,
+    riskLevel: 'unknown',
+    riskFactors: [],
+  };
+
+  const meta: TraceMeta = {
+    transfersAnalyzed: 0,
+    depthExplored: 0,
+    earliestTransferAt: null,
+    latestTransferAt: null,
+    searchedBlockRanges: [],
+    noTransfersFound: true,
+    notes: ['直近の探索範囲ではUSDTの送受信が見つかりませんでした。'],
+  };
+
+  return {
+    requestId: `empty-${address}-${Date.now()}`,
+    rootAddress: address,
+    chainHint: chain === 'ANY' ? undefined : chain,
+    generatedAt: new Date().toISOString(),
+    summary: {
+      finalDestination: address,
+      finalDestinationConfidence: 0.25,
+      suspiciousHopCount: 0,
+      suspiciousConfidence: 0.1,
+      fragmentationLevel: 0,
+      fragmentationConfidence: 0.1,
+    },
+    nodes: [root],
+    meta,
+  };
+};
 
 export const traceService = {
   async buildTrace(input: TraceRequestInput): Promise<TraceResult> {
@@ -24,7 +67,11 @@ export const traceService = {
     }
 
     if (!result) {
-      result = enrichTraceWithSummary(buildMockTrace(input.address));
+      if (input.chain === 'ETHEREUM' || (!input.chain && input.address.startsWith('0x'))) {
+        result = enrichTraceWithSummary(buildEmptyTrace(input.address, 'ETHEREUM'));
+      } else {
+        result = enrichTraceWithSummary(buildMockTrace(input.address));
+      }
     }
 
     recentSearches.set(key, result);
