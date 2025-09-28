@@ -1,0 +1,83 @@
+import { TraceNode, TraceResult } from './trace.types.js';
+
+const generateMockNodes = (rootAddress: string): TraceNode[] => {
+  const baseTime = Date.now();
+
+  return [
+    {
+      id: '1',
+      depth: 0,
+      address: rootAddress,
+      chain: 'TRON',
+      txHash: '0xroot',
+      timestamp: new Date(baseTime - 1000 * 60 * 60).toISOString(),
+      usdtAmount: 12500,
+      usdRate: 1,
+      fee: 0.8,
+      riskLevel: 'medium',
+      riskFactors: ['新規アドレス', '高速連続送金'],
+    },
+    {
+      id: '2',
+      parentId: '1',
+      depth: 1,
+      address: 'TJ4g3...x92',
+      addressLabel: '取引所入金用アドレス',
+      chain: 'TRON',
+      txHash: '0xhop1',
+      timestamp: new Date(baseTime - 1000 * 50).toISOString(),
+      usdtAmount: 12000,
+      usdRate: 1,
+      fee: 1.2,
+      riskLevel: 'high',
+      riskFactors: ['ブラックリスト一致'],
+    },
+    {
+      id: '3',
+      parentId: '2',
+      depth: 2,
+      address: '0x9dF1...eB3',
+      addressLabel: 'DeFiブリッジコントラクト',
+      chain: 'ETHEREUM',
+      txHash: '0xhop2',
+      timestamp: new Date(baseTime - 1000 * 15).toISOString(),
+      usdtAmount: 11850,
+      usdRate: 1,
+      fee: 12.5,
+      riskLevel: 'medium',
+      riskFactors: ['複雑な経路'],
+    },
+    {
+      id: '4',
+      parentId: '3',
+      depth: 3,
+      address: '0xBinanceHotWallet',
+      addressLabel: 'Binance Hot Wallet',
+      chain: 'ETHEREUM',
+      txHash: '0xhop3',
+      timestamp: new Date(baseTime).toISOString(),
+      usdtAmount: 11500,
+      usdRate: 1,
+      fee: 8.2,
+      riskLevel: 'low',
+      riskFactors: ['既知の取引所アドレス'],
+    },
+  ];
+};
+
+export const buildMockTrace = (address: string): TraceResult => ({
+  requestId: `mock-${address}`,
+  rootAddress: address,
+  chainHint: 'TRON',
+  generatedAt: new Date().toISOString(),
+  summary: {
+    finalDestination: 'Binance Hot Wallet',
+    finalDestinationLabel: 'Binance 7',
+    finalDestinationConfidence: 0.95,
+    suspiciousHopCount: 3,
+    suspiciousConfidence: 0.87,
+    fragmentationLevel: 12,
+    fragmentationConfidence: 0.78,
+  },
+  nodes: generateMockNodes(address),
+});
