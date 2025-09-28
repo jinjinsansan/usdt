@@ -5,7 +5,11 @@ import { TraceRequestInput, TraceResult, TraceMeta, TraceNode } from './trace.ty
 
 const recentSearches = new Map<string, TraceResult>();
 
-const buildEmptyTrace = (address: string, chain: 'ETHEREUM' | 'TRON' | 'BSC' | 'POLYGON' | 'ANY' = 'ANY'): TraceResult => {
+const buildEmptyTrace = (
+  address: string,
+  chain: 'ETHEREUM' | 'TRON' | 'BSC' | 'POLYGON' | 'ANY' = 'ANY',
+  balances?: TraceResult['balances'],
+): TraceResult => {
   const root: TraceNode = {
     id: `root-${address}`,
     depth: 0,
@@ -45,10 +49,24 @@ const buildEmptyTrace = (address: string, chain: 'ETHEREUM' | 'TRON' | 'BSC' | '
     },
     nodes: [root],
     meta,
-    balances: {
-      usdt: { amount: 0, raw: '0', symbol: 'USDT' },
-      native: { amount: 0, raw: '0', symbol: chain === 'ETHEREUM' ? 'ETH' : chain === 'TRON' ? 'TRX' : chain === 'BSC' ? 'BNB' : chain === 'POLYGON' ? 'MATIC' : 'ETH' },
-    },
+    balances:
+      balances ?? {
+        usdt: { amount: 0, raw: '0', symbol: 'USDT' },
+        native: {
+          amount: 0,
+          raw: '0',
+          symbol:
+            chain === 'ETHEREUM'
+              ? 'ETH'
+              : chain === 'TRON'
+                ? 'TRX'
+                : chain === 'BSC'
+                  ? 'BNB'
+                  : chain === 'POLYGON'
+                    ? 'MATIC'
+                    : 'ETH',
+        },
+      },
   };
 };
 
@@ -61,18 +79,25 @@ export const traceService = {
     }
 
     let result: TraceResult | null = null;
+    let balancesOverride: TraceResult['balances'] | undefined;
 
-    if ((input.chain === 'ETHEREUM' || (!input.chain && input.address.startsWith('0x')))) {
-      result = await fetchEthereumTrace(input).catch((error) => {
+    if (input.chain === 'ETHEREUM' || (!input.chain && input.address.startsWith('0x'))) {
+      result = await fetchEthereumTrace(input).catch((error: unknown) => {
+        if (error && typeof error === 'object' && 'balances' in error) {
+          const maybeBalances = (error as { balances?: TraceResult['balances'] }).balances;
+          if (maybeBalances) {
+            balancesOverride = maybeBalances;
+          }
+        }
         // eslint-disable-next-line no-console
-        console.error('Ethereum trace failed, falling back to mock', error);
+        console.error('Ethereum trace failed, returning empty result', error);
         return null;
       });
     }
 
     if (!result) {
       if (input.chain === 'ETHEREUM' || (!input.chain && input.address.startsWith('0x'))) {
-        result = enrichTraceWithSummary(buildEmptyTrace(input.address, 'ETHEREUM'));
+        result = enrichTraceWithSummary(buildEmptyTrace(input.address, 'ETHEREUM', balancesOverride));
       } else {
         result = enrichTraceWithSummary(buildMockTrace(input.address));
       }

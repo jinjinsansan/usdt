@@ -102,6 +102,7 @@ export const fetchEthereumTrace = async (input: TraceRequestInput): Promise<Trac
   } catch (error) {
     // eslint-disable-next-line no-console
     console.warn('Failed to fetch balances', error);
+    throw Object.assign(new Error('Balance fetch failed'), { balances });
   }
 
   const rootNode: TraceNode = {
